@@ -252,6 +252,8 @@ namespace Microsoft.EntityFrameworkCore.Migrations.Design
             GenerateFluentApiForAnnotation(ref annotations, RelationalFullAnnotationNames.Instance.ComputedColumnSql, nameof(RelationalPropertyBuilderExtensions.HasComputedColumnSql), stringBuilder);
             GenerateFluentApiForAnnotation(ref annotations, RelationalFullAnnotationNames.Instance.DefaultValue, nameof(RelationalPropertyBuilderExtensions.HasDefaultValue), stringBuilder);
 
+            IgnoreAnnotations(annotations, CoreAnnotationNames.ValueGeneratorFactoryAnnotation);
+
             GenerateAnnotations(annotations, stringBuilder);
         }
 
@@ -582,6 +584,23 @@ namespace Microsoft.EntityFrameworkCore.Migrations.Design
 
             GenerateAnnotations(annotations, stringBuilder);
         }
+
+        protected virtual void IgnoreAnnotations(
+            [NotNull] IList<IAnnotation> annotations, [NotNull] params string[] annotationNames)
+        {
+            Check.NotNull(annotations, nameof(annotations));
+            Check.NotNull(annotationNames, nameof(annotationNames));
+
+            foreach (var annotationName in annotationNames)
+            {
+                var annotation = annotations.FirstOrDefault(a => a.Name == annotationName);
+                if (annotation != null)
+                {
+                    annotations.Remove(annotation);
+                }
+            }
+        }
+
 
         protected virtual void GenerateAnnotations(
             [NotNull] IReadOnlyList<IAnnotation> annotations, [NotNull] IndentedStringBuilder stringBuilder)
